@@ -1,7 +1,7 @@
-import {cardTemplate} from '../index.js';
-import {closeEsc} from './modal.js'; 
+import {handleEscape} from './modal.js'; 
+const cardTemplate = document.querySelector("#card-template").content;
 
-export function createCard (title, link, removeCard, like) {
+export function createCard (title, link, removeCard, like,cardImagePopup) {
     const cardContent = cardTemplate.querySelector('.card').cloneNode(true); 
     const cardImage =  cardContent.querySelector('.card__image');
       
@@ -12,22 +12,11 @@ export function createCard (title, link, removeCard, like) {
     const deleteButton = cardContent.querySelector('.card__delete-button'); 
     deleteButton.addEventListener('click', removeCard); 
 
-    cardImage.addEventListener ('click', () =>{
-        const form = document.querySelector(".popup_type_image");
-        const popupImage = document.querySelector (".popup__image");
-        const caption = document.querySelector (".popup__caption");
-        form.classList.add ('popup_is-opened');
-        closeEsc(form);
-        popupImage.src =  cardImage.src;
-        popupImage.alt = cardImage.alt;
-        caption.textContent = title;
-    });
-
     const likeButton = cardContent.querySelector('.card__like-button');
     likeButton.addEventListener('click', ()=>{
         like(likeButton);
     });
-    
+    cardImagePopup (title, link, cardImage, handleEscape);
     return cardContent; 
 }
   

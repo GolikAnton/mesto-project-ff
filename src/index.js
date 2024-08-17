@@ -1,14 +1,13 @@
 import './pages/index.css';
 import {initialCards} from './scripts/cards.js';
 import {createCard, removeCard, like} from './scripts/card.js';
-import {openModal, closeModal} from './scripts/modal.js'
+import {openModal, closeModal, modals, closePopups, handleEscape} from './scripts/modal.js'
 
-export const cardTemplate = document.querySelector("#card-template").content;
 const placesList = document.querySelector(".places__list");
 const editButton = document.querySelector(".profile__edit-button");
 const editForm = document.querySelector(".popup_type_edit");
-let profileTitle = document.querySelector(".profile__title");
-let profileDescription = document.querySelector(".profile__description");
+const profileTitle = document.querySelector(".profile__title");
+const profileDescription = document.querySelector(".profile__description");
 const formElement = document.querySelector("form[name=edit-profile]");
 const nameInput = document.querySelector(".popup__input_type_name");
 const jobInput = document.querySelector(".popup__input_type_description");
@@ -19,10 +18,11 @@ const placeNameInput = document.querySelector(".popup__input_type_card-name");
 const linkInput = document.querySelector(".popup__input_type_url");
 
 initialCards.forEach((card) => { 
-  const cardContent = createCard(card.name, card.link, removeCard, like);
+  const cardContent = createCard(card.name, card.link, removeCard, like, cardImagePopup);
   placesList.append(cardContent);
 });
 
+closePopups(modals);
 
 editButton.addEventListener ('click', () => {
   openModal (editForm);
@@ -53,15 +53,27 @@ addButton.addEventListener ('click', () => {
 function handleFormCardSubmit(evt) {
   evt.preventDefault();
   
-  let card = {
+  const card = {
     name: placeNameInput.value,
     link: linkInput.value,
   };
   
-  placesList.prepend(createCard (card.name, card.link, removeCard, like));
+  placesList.prepend(createCard (card.name, card.link, removeCard, like, cardImagePopup));
   addCardForm.reset();
   closeModal(newCardForm);
 }
 
 addCardForm.addEventListener('submit', handleFormCardSubmit); 
  
+function cardImagePopup (title, link, cardImage, handleEscape) {
+  cardImage.addEventListener ('click', () =>{
+    const form = document.querySelector(".popup_type_image");
+    const popupImage = document.querySelector (".popup__image");
+    const caption = document.querySelector (".popup__caption");
+    form.classList.add ('popup_is-opened');
+    handleEscape(form);
+    popupImage.src = link;
+    popupImage.alt = title;
+    caption.textContent = title;
+  });
+};
