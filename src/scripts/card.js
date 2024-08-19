@@ -1,7 +1,7 @@
-import {handleEscape} from './modal.js'; 
-const cardTemplate = document.querySelector("#card-template").content;
+import {openModal} from './modal.js'; 
 
-export function createCard (title, link, removeCard, like,cardImagePopup) {
+export function createCard (title, link, removeCard, like, handleCardImage) {
+    const cardTemplate = document.querySelector("#card-template").content;
     const cardContent = cardTemplate.querySelector('.card').cloneNode(true); 
     const cardImage =  cardContent.querySelector('.card__image');
       
@@ -16,9 +16,13 @@ export function createCard (title, link, removeCard, like,cardImagePopup) {
     likeButton.addEventListener('click', ()=>{
         like(likeButton);
     });
-    cardImagePopup (title, link, cardImage, handleEscape);
+    
+    cardImage.addEventListener ('click', () =>{
+        handleCardImage (title, link);
+    });
+
     return cardContent; 
-}
+};
   
 export function removeCard(evt) { 
     const eventTarget = evt.target; 

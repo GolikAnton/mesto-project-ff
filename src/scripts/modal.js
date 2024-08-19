@@ -1,5 +1,3 @@
-export const modals = document.querySelectorAll('.popup');
-
 export function handleEscape(evt) {
   if (evt.key === 'Escape') {
     closeModal(document.querySelector('.popup_is-opened'));
@@ -13,10 +11,12 @@ export function openModal (form) {
 
 export function closeModal (form) {
   form.classList.remove ('popup_is-opened');
-  document.addEventListener('keydown', handleEscape);
+  document.removeEventListener('keydown', handleEscape);
 };
 
-export function closePopups (modals) { 
+export function setPopupListeners () { 
+  const modals = document.querySelectorAll('.popup');
+
   modals.forEach((form) => {
     form.classList.add ('popup_is-animated');
     form.addEventListener('click', (event) => {
