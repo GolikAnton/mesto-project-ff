@@ -1,5 +1,5 @@
 import './pages/index.css';
-import {createCard} from './scripts/card.js';
+import {createCard, removeCard, like} from './scripts/card.js';
 import {openModal, closeModal, setPopupListeners} from './scripts/modal.js'
 import { enableValidation, clearValidation} from './scripts/validation.js';
 import { addCard, deleteCard, editUserInfo, editUserAvatar,getCards, getUserInfo, likeCard, unLikeCard} from './scripts/api.js';
@@ -37,14 +37,14 @@ const validationParameters = {
 
 let profileId;
 
-Promise.all([getUserInfo(),getCards()]).then((data)=> {
+Promise.all([getUserInfo(),getCards()]).then(([userInfo,cards])=> {
   
-    profileTitle.textContent = data[0].name;
-    profileDescription.textContent = data[0].about;
-    profileImage.style = `background-image: url(${data[0].avatar})`;
-    profileId= data[0]._id;
+    profileTitle.textContent = userInfo.name;
+    profileDescription.textContent = userInfo.about;
+    profileImage.style = `background-image: url(${userInfo.avatar})`;
+    profileId= userInfo._id;
 
-    data[1].forEach((card) => {
+    cards.forEach((card) => {
       const cardContent = createCard(
         card.name, 
         card.link, 
@@ -55,11 +55,16 @@ Promise.all([getUserInfo(),getCards()]).then((data)=> {
         card.owner._id,
         card._id,
         likeCard,
-        unLikeCard
+        unLikeCard,
+        removeCard,
+        like
       );
       placesList.append(cardContent);  
     })
 })
+.catch((err) => {
+  console.log(err); // "Что-то пошло не так: ..."
+});
 
 setPopupListeners();
 enableValidation(validationParameters);
@@ -85,6 +90,9 @@ function handleFormProfileSubmit(evt) {
       profileTitle.textContent = result.name;
       profileDescription.textContent = result.about;
   })
+  .catch((err) => {
+    console.log(err); // "Что-то пошло не так: ..."
+  })
   .finally(() =>{renderLoading(submitButton,false)});
   
   closeModal(editForm);
@@ -103,6 +111,9 @@ function handleFormAvatarSubmit(evt) {
   renderLoading(submitButton,true)
   editUserAvatar(urlInput.value).then((data)=>{
     profileImage.style = `background-image: url(${data.avatar})`
+  })
+  .catch((err) => {
+    console.log(err); // "Что-то пошло не так: ..."
   })
   .finally(() =>{renderLoading(submitButton,false)});
 
@@ -133,12 +144,17 @@ function handleFormCardSubmit(evt) {
       deleteCard,
       handleCardImage,
       data.likes,
-      '',
-      '',
+      profileId,
+      data.owner._id,
       cardId,
       likeCard,
-      unLikeCard
+      unLikeCard,
+      removeCard,
+      like
     ));
+  })
+  .catch((err) => {
+    console.log(err); // "Что-то пошло не так: ..."
   })
   .finally(() =>{renderLoading(submitButton,false)});
   
@@ -156,10 +172,6 @@ function handleCardImage (title, link) {
 };
 
 const renderLoading = (button, isLoading) => {
-  if (isLoading) {
-    button.textContent = 'Сохранение...';
-  } else {
-    button.textContent = 'Сохранить';
-  }
+  button.textContent = isLoading ? 'Сохранение...' : 'Сохранить';
 };
 
